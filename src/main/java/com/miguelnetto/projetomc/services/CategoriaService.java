@@ -3,10 +3,12 @@ package com.miguelnetto.projetomc.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.miguelnetto.projetomc.domain.Categoria;
 import com.miguelnetto.projetomc.repositories.CategoriaRepository;
+import com.miguelnetto.projetomc.services.exceptions.DataIntegrityException;
 import com.miguelnetto.projetomc.services.exceptions.ObjectNotFoundException;
 
 @Service
@@ -29,6 +31,16 @@ public class CategoriaService {
 	public Categoria update(Categoria obj) {
 		find(obj.getId());
 		return repo.save(obj);
+	}
+	
+	public void delete(Integer id) {
+		find(id);
+		try {
+			repo.deleteById(id);
+		}catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityException("Não é possivel um categoria que possui produtos");
+		}
+		
 	}
 	
 }
